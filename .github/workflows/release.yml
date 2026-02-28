@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build release binary
+        run: swift build -c release
+
+      - name: Prepare release artifact
+        run: |
+          mkdir -p release
+          cp .build/release/AeroHints release/
+          cd release && zip AeroHints.zip AeroHints
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/AeroHints.zip
+          generate_release_notes: true
