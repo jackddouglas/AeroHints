@@ -17,7 +17,7 @@
 
         src = pkgs.fetchurl {
           url = "https://github.com/jackddouglas/AeroHints/releases/download/v${version}/AeroHints.zip";
-          hash = "sha256-Wg2VnTb19J3TeQHRsQTwMKzSMZcJZm8BxSrHAwIp4i0=";
+          hash = "sha256-n7DYCNsPNM//T9CtNE7sWwtDVe7tS6zLEitmbdD/HUk=";
         };
 
         nativeBuildInputs = [ pkgs.unzip ];

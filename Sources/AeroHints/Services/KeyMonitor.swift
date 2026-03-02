@@ -62,15 +62,18 @@ final class KeyMonitor {
         }
     }
 
+    /// Device-specific modifier flag bits from IOKit (NX_DEVICE* masks).
+    /// These distinguish right-side modifiers from left-side, unlike the
+    /// aggregate `.command` / `.option` flags on NSEvent.ModifierFlags.
+    private static let deviceRightCommandMask: UInt64 = 0x0000_0010
+    private static let deviceRightOptionMask: UInt64 = 0x0000_0040
+
     private func updatePressedKeyCodes(with event: NSEvent) {
-        switch event.keyCode {
-        case Self.rightOptionKeyCode:
-            updatePressedKey(Self.rightOptionKeyCode, isDown: event.modifierFlags.contains(.option))
-        case Self.rightCommandKeyCode:
-            updatePressedKey(Self.rightCommandKeyCode, isDown: event.modifierFlags.contains(.command))
-        default:
-            break
-        }
+        guard let cgEvent = event.cgEvent else { return }
+        let rawFlags = cgEvent.flags.rawValue
+
+        updatePressedKey(Self.rightCommandKeyCode, isDown: (rawFlags & Self.deviceRightCommandMask) != 0)
+        updatePressedKey(Self.rightOptionKeyCode, isDown: (rawFlags & Self.deviceRightOptionMask) != 0)
     }
 
     private func updatePressedKey(_ keyCode: UInt16, isDown: Bool) {
