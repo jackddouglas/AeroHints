@@ -8,7 +8,7 @@
     let
       system = "aarch64-darwin";
       pkgs = nixpkgs.legacyPackages.${system};
-      version = "0.1.1";
+      version = "0.1.2";
     in
     {
       packages.${system}.default = pkgs.stdenvNoCC.mkDerivation {
@@ -17,7 +17,7 @@
 
         src = pkgs.fetchurl {
           url = "https://github.com/jackddouglas/AeroHints/releases/download/v${version}/AeroHints.zip";
-          hash = "sha256-Wg2VnTb19J3TeQHRsQTwMKzSMZcJZm8BxSrHAwIp4i0=";
+          hash = "sha256-fJUdMr3e0s1wCEryxgzrIua0ZBFUsaOysSG3FgknxBo=";
         };
 
         nativeBuildInputs = [ pkgs.unzip ];
