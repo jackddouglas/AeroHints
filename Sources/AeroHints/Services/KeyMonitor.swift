@@ -1,17 +1,20 @@
 import AppKit
 import Combine
 
-/// Monitors for left option key hold to trigger showing the overlay.
+/// Monitors for right command + option key hold to trigger showing the overlay.
 final class KeyMonitor {
     private var globalMonitor: Any?
     private var holdTimer: DispatchWorkItem?
     private var holdTriggered = false
     private let holdDelay: TimeInterval
+    private var pressedKeyCodes: Set<UInt16> = []
 
     let onHoldTriggered = PassthroughSubject<Void, Never>()
     let onReleased = PassthroughSubject<Void, Never>()
 
-    private static let leftOptionKeyCode: UInt16 = 58 // kVK_Option
+    private static let rightOptionKeyCode: UInt16 = 61
+    private static let rightCommandKeyCode: UInt16 = 54
+    private static let activationKeyCodes: Set<UInt16> = [rightOptionKeyCode, rightCommandKeyCode]
 
     init(holdDelay: TimeInterval = 0.3) {
         self.holdDelay = holdDelay
@@ -44,9 +47,9 @@ final class KeyMonitor {
     // MARK: - Private
 
     private func handleFlagsChanged(_ event: NSEvent) {
-        guard event.keyCode == Self.leftOptionKeyCode else { return }
+        updatePressedKeyCodes(with: event)
 
-        if event.modifierFlags.contains(.option) {
+        if Self.activationKeyCodes.isSubset(of: pressedKeyCodes) {
             holdTriggered = false
             startHoldTimer()
         } else {
@@ -56,6 +59,25 @@ final class KeyMonitor {
                 holdTriggered = false
                 onReleased.send()
             }
+        }
+    }
+
+    private func updatePressedKeyCodes(with event: NSEvent) {
+        switch event.keyCode {
+        case Self.rightOptionKeyCode:
+            updatePressedKey(Self.rightOptionKeyCode, isDown: event.modifierFlags.contains(.option))
+        case Self.rightCommandKeyCode:
+            updatePressedKey(Self.rightCommandKeyCode, isDown: event.modifierFlags.contains(.command))
+        default:
+            break
+        }
+    }
+
+    private func updatePressedKey(_ keyCode: UInt16, isDown: Bool) {
+        if isDown {
+            pressedKeyCodes.insert(keyCode)
+        } else {
+            pressedKeyCodes.remove(keyCode)
         }
     }
 

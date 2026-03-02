@@ -10,7 +10,7 @@ final class AerospaceConfig {
             "/usr/local/bin/aerospace",
             "/opt/homebrew/bin/aerospace",
         ]
-        self.binaryPath = candidates.first { FileManager.default.isExecutableFile(atPath: $0) }
+        binaryPath = candidates.first { FileManager.default.isExecutableFile(atPath: $0) }
             ?? "aerospace"
     }
 
@@ -42,7 +42,7 @@ final class AerospaceConfig {
             return nil
         }
 
-        let bindings = dict.compactMap { (key, value) -> KeyBinding? in
+        let bindings = dict.compactMap { key, value -> KeyBinding? in
             parseBinding(key: key, rawValue: value, modeName: name)
         }
         let collapsed = collapseBindings(bindings).sorted { $0.displayKey < $1.displayKey }
@@ -57,8 +57,8 @@ final class AerospaceConfig {
         // Filter out noise: sketchybar triggers, AeroHints notifications, bare "mode main"
         let meaningful = commands.filter { cmd in
             !cmd.contains("sketchybar --trigger") &&
-            !cmd.contains("AeroHints") &&
-            cmd != "mode main"
+                !cmd.contains("AeroHints") &&
+                cmd != "mode main"
         }
 
         let displayLabel: String
@@ -188,7 +188,7 @@ final class AerospaceConfig {
             }
         }
 
-        let commonPrefix = String(first[first.startIndex...prefixEnd]).trimmingCharacters(in: .whitespaces)
+        let commonPrefix = String(first[first.startIndex ... prefixEnd]).trimmingCharacters(in: .whitespaces)
         return "\(commonPrefix) 0-9"
     }
 
@@ -260,16 +260,16 @@ final class AerospaceConfig {
 
         // Move workspace to monitor
         if command.hasPrefix("move-workspace-to-monitor") {
-            return ("Move WS to Next Monitor", .workspaces)
+            return ("Move to Next Monitor", .workspaces)
         }
 
         // Workspace switch
-        if command.hasPrefix("workspace") && !command.contains("move") {
+        if command.hasPrefix("workspace"), !command.contains("move") {
             if command == "workspace-back-and-forth" {
                 return ("Previous Workspace", .workspaces)
             }
             let ws = command.replacingOccurrences(of: "workspace ", with: "")
-            return ("Workspace \(ws)", .workspaces)
+            return ("Focus WS \(ws)", .workspaces)
         }
 
         // Layout
